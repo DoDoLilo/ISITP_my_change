@@ -1,7 +1,6 @@
 package com.dadachen.isitp
 
 import android.os.Bundle
-import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import com.androidplot.xy.LineAndPointFormatter
 import com.androidplot.xy.PointLabelFormatter
@@ -9,13 +8,13 @@ import kotlinx.android.synthetic.main.activity_main.*
 
 
 /* *
-* 1st, obtain IMU data.
-* 2nd, post processing IMU data by low-pass filters. todo
-* 3rd, transfer it to tensors.
-* 4th, forward the pre-saved net with tensors.
-* 5th, calculate the estimated location and display it on UI.
+* 1st, obtain IMU data.     //获取IMU数据
+* 2nd, post processing IMU data by low-pass filters. todo　
+* 3rd, transfer it to tensors. //转换为“张量”
+* 4th, forward the pre-saved net with tensors. //前向传播，将tensors放入网络中
+* 5th, calculate the estimated location and display it on UI. //计算估计的位置并显示在UI上。
 * 6th, additionally, it supports gesture estimation and show the doubt value. todo
-* 7th, remember, it should be always fully tested with both unit and integrated
+* 7th, remember, it should be always fully tested with both unit and integrated //软件测试技术——单元测试和集成测试
 * @Author dadachen
 * */
 class MainActivity : AppCompatActivity() {
@@ -25,7 +24,7 @@ class MainActivity : AppCompatActivity() {
         initView()
     }
     private var isLoading = false
-    private fun initView() {
+    private fun initView() {//俩功能按钮的监听
         bt_load_module.setOnClickListener {
             if (!isLoading) {
                 loadInitModuleAndInitIMUCollector()
@@ -42,7 +41,7 @@ class MainActivity : AppCompatActivity() {
         sw_save_csv.setOnCheckedChangeListener { _, isChecked ->
             FilterConstant.RECORD_CSV = isChecked
         }
-    }
+    } //√
 
     private fun loadInitModuleAndInitIMUCollector() {
         collector = IMUCollector(this) {
@@ -60,7 +59,7 @@ class MainActivity : AppCompatActivity() {
         startRecord()
     }
 
-    private lateinit var collector: IMUCollector
+    private lateinit var collector: IMUCollector //后初始化
     private fun startRecord() {
         collector.start()
 //        Toast.makeText(this, "load module success", Toast.LENGTH_SHORT).show()
