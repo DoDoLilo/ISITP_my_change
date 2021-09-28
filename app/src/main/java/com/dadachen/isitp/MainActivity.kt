@@ -47,8 +47,8 @@ class MainActivity : AppCompatActivity() {
         collector = IMUCollector(this) {
             runOnUiThread {
                 tv_res.text = it.contentToString()
+                drawPlot(it[0],it[1])
             }
-            drawPlot(it[0],it[1])
         }
         collector.setGestureTypeChangeListener {
             runOnUiThread {
