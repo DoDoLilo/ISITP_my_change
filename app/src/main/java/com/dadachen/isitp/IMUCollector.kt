@@ -139,18 +139,18 @@ class IMUCollector(private val context: Context, private val modulePartial: (Flo
     }
     private val stringBuilder = StringBuilder()
     private fun copyData(tData:Array<FloatArray>, offset:Int=0):FloatArray{
-        val tempoData = FloatArray(DATA_SIZE)
-        for (index in offset until FRAME_SIZE) {
+        val tempoData = FloatArray(DATA_SIZE)  //1200
+        for (index in offset until FRAME_SIZE) { //the last data
             //low-pass filters are muted.
 //                filters[index].filter(floatArray).copyInto(tempoData, index * FRAME_SIZE)
             for (i in 0 until 6){
-                tempoData[(index-offset)*6+i] = tData[i][index]
+                tempoData[(index-offset)*6+i] = tData[i][index] //从0开始，填的是上轮数据
             }
         }
         val tOffset = FRAME_SIZE-offset
-        for (index in 0 until offset) {
+        for (index in 0 until offset) {  //the latest data
             for (i in 0 until 6) {
-                tempoData[tOffset+index*6+i] = tData[i][index]
+                tempoData[(tOffset+index)*6+i] = tData[i][index] //从offset开始，填的是新数据
             }
         }
         return tempoData
