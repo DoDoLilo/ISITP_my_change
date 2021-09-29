@@ -12,7 +12,6 @@ import kotlinx.coroutines.launch
 import org.pytorch.IValue
 import org.pytorch.Module
 import org.pytorch.Tensor
-import java.lang.StringBuilder
 import kotlin.concurrent.thread
 
 class IMUCollector(private val context: Context, private val modulePartial: (FloatArray) -> Unit) {
@@ -39,19 +38,19 @@ class IMUCollector(private val context: Context, private val modulePartial: (Flo
         stringBuilder.clear()
         thread(start = true) {
             var index = 0
-            while (index < 192) {
+            while (index < 200) { //
                 fillData(index++)
                 Thread.sleep(FREQ_INTERVAL)
             }
             //check gesture and init estimation module by it
             checkGestureAndSwitchModule(data.copyOf())
-            index = 0
+            //index = 0
             while (status == Status.Running) {
 
                 if (index == FRAME_SIZE) {
                     val tData = data.copyOf()
                     //check gesture but not changing estimation module
-                    checkGesture(tData)
+                    //checkGesture(tData)
                     //estimation by using 200 frames IMU-sensor
                     estimate(tData)
                     //next step reset offset to zero
@@ -62,7 +61,7 @@ class IMUCollector(private val context: Context, private val modulePartial: (Flo
                     estimate(tData,index)
                 }
                 fillData(index++)
-                Thread.sleep(FREQ_INTERVAL)
+                Thread.sleep(FREQ_INTERVAL) //这里控制了sleep 5ms，即200Hz
             }
         }
     }
@@ -144,13 +143,13 @@ class IMUCollector(private val context: Context, private val modulePartial: (Flo
             //low-pass filters are muted.
 //                filters[index].filter(floatArray).copyInto(tempoData, index * FRAME_SIZE)
             for (i in 0 until 6){
-                tempoData[(index-offset)*6+i] = tData[i][index] //从0开始，填的是上轮数据
+                tempoData[(index-offset)*6+i] = tData[i][index]
             }
         }
         val tOffset = FRAME_SIZE-offset
         for (index in 0 until offset) {  //the latest data
             for (i in 0 until 6) {
-                tempoData[(tOffset+index)*6+i] = tData[i][index] //从offset开始，填的是新数据
+                tempoData[(tOffset+index)*6+i] = tData[i][index]
             }
         }
         return tempoData
@@ -159,6 +158,8 @@ class IMUCollector(private val context: Context, private val modulePartial: (Flo
     private fun calculateDistance(res: FloatArray) {
         currentLoc[0] += res[0] * V_INTERVAL
         currentLoc[1] += res[1] * V_INTERVAL
+//        currentLoc[0] = res[0]
+//        currentLoc[1] = res[1]
     }
 
     private var status = Status.Idle
