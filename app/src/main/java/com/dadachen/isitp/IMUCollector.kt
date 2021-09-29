@@ -55,7 +55,7 @@ class IMUCollector(private val context: Context, private val modulePartial: (Flo
                     estimate(tData)
                     //next step reset offset to zero
                     index = 0
-                } else if (index % STEP == 0) {
+                } else if (index % STEP == 0) { //每10*5ms进行一输出
                     //note index is always more than 1
                     val tData = data.copyOf()
                     estimate(tData,index)
@@ -122,7 +122,7 @@ class IMUCollector(private val context: Context, private val modulePartial: (Flo
     }
     private val coroutineScope = CoroutineScope(Dispatchers.Default)
     private lateinit var module: Module
-    private fun estimate(tData: Array<FloatArray>, offset: Int = 0) {
+    private fun  estimate(tData: Array<FloatArray>, offset: Int = 0) {
         //low-pass filter need parameters from MatLab
         //note: copy data in the main thread is so important,
         //please do not copy data in the coroutineScope
@@ -131,7 +131,7 @@ class IMUCollector(private val context: Context, private val modulePartial: (Flo
             val tensor = Tensor.fromBlob(tempoData, longArrayOf(1, 6, 200))
             val res = module.forward(IValue.from(tensor)).toTensor().dataAsFloatArray
             //output res for display on UI
-            calculateDistance(res)
+             calculateDistance(res)
             modulePartial(currentLoc)
 
         }
@@ -233,6 +233,6 @@ class IMUCollector(private val context: Context, private val modulePartial: (Flo
         const val DATA_SIZE = 6 * 200
         const val FREQ_INTERVAL = 5L
         const val STEP = 10
-        const val V_INTERVAL = 1f / STEP
+        const val V_INTERVAL = 1f / (FRAME_SIZE/ STEP)
     }
 }
