@@ -1,7 +1,9 @@
 package com.dadachen.isitp
 
+import android.graphics.Color
 import android.os.Bundle
 import androidx.appcompat.app.AppCompatActivity
+import com.androidplot.xy.BoundaryMode
 import com.androidplot.xy.LineAndPointFormatter
 import com.androidplot.xy.PointLabelFormatter
 import kotlinx.android.synthetic.main.activity_main.*
@@ -76,6 +78,8 @@ class MainActivity : AppCompatActivity() {
             R.xml.line_point_formatter_with_labels
         )
         plot.addSeries(series, seriesFormat)
+        plot.setDomainBoundaries(-25,25,BoundaryMode.FIXED)
+        plot.setRangeBoundaries(-25,25,BoundaryMode.FIXED)
     }
 
     private fun drawPlot(x:Float, y:Float) {
