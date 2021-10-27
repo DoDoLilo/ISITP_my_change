@@ -57,6 +57,7 @@ class MainActivity : AppCompatActivity() {
                 tv_gesture.text = it.name
             }
         }
+        plot.clear()
         initDraw()
         startRecord()
     }
@@ -78,8 +79,8 @@ class MainActivity : AppCompatActivity() {
             R.xml.line_point_formatter_with_labels
         )
         plot.addSeries(series, seriesFormat)
-        plot.setDomainBoundaries(-17,20,BoundaryMode.FIXED)
-        plot.setRangeBoundaries(-10,15,BoundaryMode.FIXED)
+        plot.setDomainBoundaries(-15,15,BoundaryMode.FIXED)
+        plot.setRangeBoundaries(-20,20,BoundaryMode.FIXED)
     }
 
     private fun drawPlot(x:Float, y:Float) {
@@ -90,11 +91,10 @@ class MainActivity : AppCompatActivity() {
     private fun removeDraw() {
         plot.removeSeries(series)
 //        plot.redraw()
-
     }
 
     private fun stopRecord() {
-        removeDraw()
+//        removeDraw()
         collector.stop()
     }
 }
