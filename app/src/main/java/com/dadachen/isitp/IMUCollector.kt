@@ -71,15 +71,6 @@ class IMUCollector(private val context: Context, private val modulePartial: (Flo
         }
     }
 
-//let outside know whether the module is running
-    fun isRunning():Boolean{
-        return status == Status.Running
-    }
-//let outside get the copy of currentLoc.
-    fun getCurrentLoc(): FloatArray{
-        return floatArrayOf(currentLoc[0], currentLoc[1])
-    }
-
     private fun changeTheAxisOfAccAndGyro(acc0:Float,acc1:Float,acc2:Float,gyro0:Float,gyro1: Float,gyro2: Float,
     rot0:Float,rot1: Float,rot2: Float,rot3: Float): FloatArray {
 //        change the acc and the gyro to the same axis by using the rot
