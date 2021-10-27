@@ -78,8 +78,8 @@ class MainActivity : AppCompatActivity() {
             R.xml.line_point_formatter_with_labels
         )
         plot.addSeries(series, seriesFormat)
-        plot.setDomainBoundaries(-25,25,BoundaryMode.FIXED)
-        plot.setRangeBoundaries(-25,25,BoundaryMode.FIXED)
+        plot.setDomainBoundaries(-17,20,BoundaryMode.FIXED)
+        plot.setRangeBoundaries(-10,15,BoundaryMode.FIXED)
     }
 
     private fun drawPlot(x:Float, y:Float) {

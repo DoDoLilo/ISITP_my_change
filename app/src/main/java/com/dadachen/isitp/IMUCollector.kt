@@ -41,7 +41,7 @@ class IMUCollector(private val context: Context, private val modulePartial: (Flo
         status = Status.Running
         stringBuilder.clear()
         //start thread
-        thread(start = true) {
+        thread(start = true) { //创建一个thread并运行指定代码块，()->Unit
             var index=0
             var index2=0
             while(index<200){
@@ -71,6 +71,15 @@ class IMUCollector(private val context: Context, private val modulePartial: (Flo
         }
     }
 
+//let outside know whether the module is running
+    fun isRunning():Boolean{
+        return status == Status.Running
+    }
+//let outside get the copy of currentLoc.
+    fun getCurrentLoc(): FloatArray{
+        return floatArrayOf(currentLoc[0], currentLoc[1])
+    }
+
     private fun changeTheAxisOfAccAndGyro(acc0:Float,acc1:Float,acc2:Float,gyro0:Float,gyro1: Float,gyro2: Float,
     rot0:Float,rot1: Float,rot2: Float,rot3: Float): FloatArray {
 //        change the acc and the gyro to the same axis by using the rot
@@ -88,7 +97,7 @@ class IMUCollector(private val context: Context, private val modulePartial: (Flo
     }
 
     private fun fillData(index: Int, index2: Int=0) {
-        //acc gyro rot
+//        acc gyro rot
 //        val gyroAccChanged=changeTheAxisOfAccAndGyro(
 //            seqList[index2][0],seqList[index2][1],seqList[index2][2], //acc
 //            seqList[index2][3],seqList[index2][4],seqList[index2][5],  //gyro
@@ -106,11 +115,8 @@ class IMUCollector(private val context: Context, private val modulePartial: (Flo
         data[3][index] = gyroAccChanged[3]
         data[4][index] = gyroAccChanged[4]
         data[5][index] = gyroAccChanged[5]
-//        println(index2.toString()+":"+seqList[index2][3].toString()+","+seqList[index2][4].toString()+","+seqList[index2][5].toString()+","+seqList[index2][0].toString()+","+seqList[index2][1].toString()+","+seqList[index2][2].toString())
-//        println(index2.toString()+":"+data[0][index].toString()+","+data[1][index].toString()+","+data[2][index].toString()+","+data[3][index].toString()+","+data[4][index].toString()+","+data[5][index].toString())
         if (FilterConstant.RECORD_CSV){
             stringBuilder.append("${data[0][index]}, ${data[1][index]}, ${data[2][index]}, ${data[3][index]}, ${data[4][index]}, ${data[5][index]}\n")
-//            stringBuilder.append("${data[0][index]}, ${data[1][index]}, ${data[2][index]}, ${data[3][index]}, ${data[4][index]}, ${data[5][index]}\n")
         }
     }
 

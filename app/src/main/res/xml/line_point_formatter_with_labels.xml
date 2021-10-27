@@ -5,4 +5,4 @@
     linePaint.strokeWidth="1dp"
     pointLabelFormatter.textPaint.color="#00000000"
     vertexPaint.color="#007700"
-    vertexPaint.strokeWidth="3dp" />
+    vertexPaint.strokeWidth="2dp" />
