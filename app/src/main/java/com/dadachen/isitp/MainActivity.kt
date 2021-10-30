@@ -1,5 +1,6 @@
 package com.dadachen.isitp
 
+import android.app.AlertDialog
 import android.graphics.Color
 import android.os.Bundle
 import androidx.appcompat.app.AppCompatActivity
@@ -7,6 +8,11 @@ import com.androidplot.xy.BoundaryMode
 import com.androidplot.xy.LineAndPointFormatter
 import com.androidplot.xy.PointLabelFormatter
 import kotlinx.android.synthetic.main.activity_main.*
+import java.net.Socket
+import java.io.OutputStream
+import java.io.IOException
+import java.lang.Exception
+import java.net.UnknownHostException
 
 
 /* *
@@ -26,6 +32,9 @@ class MainActivity : AppCompatActivity() {
         initView()
     }
     private var isLoading = false
+    private var defaultHostIp="10.254.7.16"
+    private var defaultPort=3000
+    private lateinit var mySocket: Socket
     private fun initView() {//俩功能按钮的监听
         bt_load_module.setOnClickListener {
             if (!isLoading) {
@@ -40,6 +49,23 @@ class MainActivity : AppCompatActivity() {
                 bt_load_module.text = getText(R.string.load_module)
             }
         }
+
+        socket_connect.setOnClickListener {
+            if(socket_host_ip.text.isEmpty()){
+                val builder = AlertDialog.Builder(this)
+                builder.setTitle("NOTE")
+                builder.setMessage("socket_host_ip.text.isEmpty()")
+                val alert = builder.create()
+                alert.show()
+            }else{
+                val builder = AlertDialog.Builder(this)
+                builder.setTitle("NOTE")
+                builder.setMessage(socket_host_ip.text.toString())
+                val alert = builder.create()
+                alert.show()
+            }
+        }
+
         sw_save_csv.setOnCheckedChangeListener { _, isChecked ->
             FilterConstant.RECORD_CSV = isChecked
         }

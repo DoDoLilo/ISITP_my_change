@@ -28,7 +28,7 @@ class IMUCollector(private val context: Context, private val modulePartial: (Flo
     private val data = Array(6) {
         FloatArray(FRAME_SIZE)
     }
-
+    private val times = LongArray(FRAME_SIZE)
     private val currentLoc = floatArrayOf(0f, 0f)
 
     private enum class Status {
@@ -52,14 +52,16 @@ class IMUCollector(private val context: Context, private val modulePartial: (Flo
             while (status == Status.Running) {
                 if (index == FRAME_SIZE) {
                     val tData = data.copyOf()
+                    val tTimes = times.copyOf()
                     //estimation by using 200 frames IMU-sensor
-                    estimate(tData,0,index2)
+                    estimate(tData,tTimes,0,index2)
                     //next step reset offset to zero
                     index = 0
                 } else if (index % STEP == 0) { //每10*5ms进行一输出
                     //note index is always more than 1
                     val tData = data.copyOf()
-                    estimate(tData,index,index2)
+                    val tTimes = times.copyOf()
+                    estimate(tData,tTimes,index,index2)
                 }
                 fillData(index++,index2++)
 //                if(index2==seqList.size) {
@@ -93,6 +95,7 @@ class IMUCollector(private val context: Context, private val modulePartial: (Flo
 //            seqList[index2][0],seqList[index2][1],seqList[index2][2], //acc
 //            seqList[index2][3],seqList[index2][4],seqList[index2][5],  //gyro
 //            seqList[index2][6],seqList[index2][7],seqList[index2][8],seqList[index2][9]) //rot
+        times[index] = System.currentTimeMillis()
         val gyroAccChanged=changeTheAxisOfAccAndGyro(
             acc[0],acc[1],acc[2], //acc
             gyro[0],gyro[1],gyro[2],  //gyro
@@ -152,7 +155,7 @@ class IMUCollector(private val context: Context, private val modulePartial: (Flo
             }
         }
         module = Module.load(Utils.assetFilePath(context, modulePath))
-        println(modulePath)
+//        println(modulePath)
     }
 
     private fun checkGesture(tData: Array<FloatArray>) {
@@ -182,7 +185,7 @@ class IMUCollector(private val context: Context, private val modulePartial: (Flo
     }
     private val coroutineScope = CoroutineScope(Dispatchers.Default)
     private lateinit var module: Module
-    private fun  estimate(tData: Array<FloatArray>, offset: Int = 0, index2: Int=0) {
+    private fun  estimate(tData: Array<FloatArray>, tTimes: LongArray, offset: Int = 0, index2: Int=0) {
         //low-pass filter need parameters from MatLab
         //note: copy data in the main thread is so important,
         //please do not copy data in the coroutineScope
@@ -191,7 +194,7 @@ class IMUCollector(private val context: Context, private val modulePartial: (Flo
         val tensor = Tensor.fromBlob(tempoData, longArrayOf(1, 6, 200))
         val res = module.forward(IValue.from(tensor)).toTensor().dataAsFloatArray
         //output res for display on UI
-        calculateDistance(res)
+        calculateDistance(res, getMovedTime(tTimes, offset))
         modulePartial(currentLoc)
 //        }
     }
@@ -229,9 +232,21 @@ class IMUCollector(private val context: Context, private val modulePartial: (Flo
         return tempoData
     }
 
-    private fun calculateDistance(res: FloatArray) {
-        currentLoc[0] += res[0] * V_INTERVAL
-        currentLoc[1] += res[1] * V_INTERVAL
+    private fun getMovedTime(tTimes: LongArray, offset: Int=0):Float{
+        val tempTimes=LongArray(FRAME_SIZE)
+        for(index in offset until FRAME_SIZE){
+            tempTimes[index-offset]=tTimes[index]
+        }
+        var startIndex= FRAME_SIZE-offset
+        for(index in 0 until offset){
+            tempTimes[startIndex+index]=tTimes[index]
+        }
+        return (tempTimes[10]-tempTimes[0])/1000f
+    }
+
+    private fun calculateDistance(res: FloatArray, movedTime: Float) {
+        currentLoc[0] += res[0] * movedTime
+        currentLoc[1] += res[1] * movedTime
     }
 
     private var status = Status.Idle
